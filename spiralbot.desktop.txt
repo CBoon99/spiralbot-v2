@@ -1,0 +1,178 @@
+# SpiralBot v2.1 Environment Configuration Template
+# =================================================
+# 
+# UK Banking Compliance Notice:
+# This template is prepared for future use but currently disabled.
+# Due to UK banking restrictions, only CoinGecko simulation mode is permitted.
+# 
+# Instructions:
+# 1. Copy this file to '.env' in your SpiralBot directory
+# 2. Fill in your actual values (when live trading becomes available)
+# 3. Keep this file secure and never commit to version control
+#
+
+# ===================
+# SYSTEM CONFIGURATION
+# ===================
+
+# Base system settings
+SPIRALBOT_VERSION=2.1
+SPIRALBOT_MODE=SIMULATION  # SIMULATION only (LIVE disabled for UK compliance)
+SPIRALBOT_LOG_LEVEL=INFO   # DEBUG, INFO, WARNING, ERROR
+
+# File paths (auto-detected, override only if needed)
+# SPIRALBOT_BASE_DIR=/path/to/spiralbot
+# SPIRALBOT_LOG_FILE=bue_log.csv
+# SPIRALBOT_BOT_LOG=bot.log
+
+# ===================
+# TRADING PARAMETERS
+# ===================
+
+# Risk management
+RISK_PER_TRADE=0.05        # 5% of available cash per trade
+MAX_POSITIONS=3            # Maximum concurrent positions
+PORTFOLIO_INITIAL=1000.0   # Starting portfolio value (GBP)
+
+# Position management
+TRAILING_STOP_PCT=0.02     # 2% trailing stop loss
+STOP_LOSS_PCT=0.03         # 3% hard stop loss
+TAKE_PROFIT_PCT=0.05       # 5% take profit target
+TRADE_DURATION=300         # Maximum trade duration (seconds)
+
+# Market scanning
+SCAN_INTERVAL=30           # Market scan interval (seconds)
+TOP_N=50                   # Number of top coins to monitor
+FEE_PCT=0.001             # Trading fee percentage (0.1%)
+
+# ===================
+# COINGECKO API (CURRENT DATA SOURCE)
+# ===================
+
+# CoinGecko settings (free tier, no API key required)
+COINGECKO_API_URL=https://api.coingecko.com/api/v3
+COINGECKO_TIMEOUT=15
+COINGECKO_RETRY_ATTEMPTS=3
+
+# Optional: CoinGecko Pro API (if you have subscription)
+# COINGECKO_API_KEY=your_coingecko_pro_key_here
+# COINGECKO_RATE_LIMIT=100  # requests per minute
+
+# ===================
+# FUTURE EXCHANGE APIS (DISABLED - UK COMPLIANCE)
+# ===================
+
+# IMPORTANT: These are disabled due to UK banking restrictions
+# Leave blank or commented out
+
+# Binance API (DISABLED)
+# BINANCE_API_KEY=your_binance_api_key_here
+# BINANCE_SECRET_KEY=your_binance_secret_key_here
+# BINANCE_TESTNET=true
+
+# Coinbase Pro API (DISABLED)
+# COINBASE_API_KEY=your_coinbase_api_key_here
+# COINBASE_SECRET_KEY=your_coinbase_secret_key_here
+# COINBASE_PASSPHRASE=your_coinbase_passphrase_here
+# COINBASE_SANDBOX=true
+
+# Kraken API (DISABLED)
+# KRAKEN_API_KEY=your_kraken_api_key_here
+# KRAKEN_SECRET_KEY=your_kraken_secret_key_here
+
+# ===================
+# DASHBOARD CONFIGURATION
+# ===================
+
+# Dashboard security
+DASHBOARD_PASSWORD=admin123  # Change this to a secure password
+DASHBOARD_PORT=8501
+DASHBOARD_HOST=localhost
+
+# Auto-refresh settings
+DASHBOARD_REFRESH_INTERVAL=30  # seconds
+DASHBOARD_MAX_LOG_ROWS=10000   # Maximum rows to keep in memory
+
+# ===================
+# NOTIFICATIONS (FUTURE)
+# ===================
+
+# Email notifications (future feature)
+# EMAIL_SMTP_SERVER=smtp.gmail.com
+# EMAIL_SMTP_PORT=587
+# EMAIL_USERNAME=your_email@gmail.com
+# EMAIL_PASSWORD=your_app_password
+# EMAIL_TO=your_trading_alerts@gmail.com
+
+# Slack notifications (future feature)
+# SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+# SLACK_CHANNEL=#trading-alerts
+
+# Telegram notifications (future feature)
+# TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+# TELEGRAM_CHAT_ID=your_telegram_chat_id
+
+# ===================
+# ADVANCED SETTINGS
+# ===================
+
+# Performance monitoring
+MONITOR_MEMORY_USAGE=true
+MEMORY_WARNING_THRESHOLD=200  # MB
+CPU_WARNING_THRESHOLD=80      # percentage
+
+# Data retention
+LOG_RETENTION_DAYS=30
+LOG_ARCHIVE_ENABLED=true
+LOG_COMPRESSION=true
+
+# API rate limiting
+API_RATE_LIMIT_ENABLED=true
+API_CALLS_PER_MINUTE=60
+
+# ===================
+# DEVELOPMENT/DEBUG
+# ===================
+
+# Debug settings
+DEBUG_MODE=false
+DEBUG_API_CALLS=false
+DEBUG_TRADE_EXECUTION=false
+DEBUG_FILE_OPERATIONS=false
+
+# Testing
+TEST_MODE=false
+TEST_DATA_ENABLED=false
+TEST_PORTFOLIO_SIZE=1000
+
+# ===================
+# UK BANKING COMPLIANCE OVERRIDES
+# ===================
+
+# WARNING: These should remain false for UK users
+LIVE_TRADING_ENABLED=false
+EXCHANGE_API_ENABLED=false
+REAL_MONEY_MODE=false
+
+# Override protection (do not enable unless legally compliant)
+SPIRALBOT_LIVE_OVERRIDE=false  # DANGER: Do not set to true
+
+# Compliance verification
+UK_BANKING_COMPLIANT=true
+SIMULATION_ONLY=true
+COINGECKO_ONLY=true
+
+# ===================
+# NOTES FOR FUTURE UPGRADES
+# ===================
+
+# When UK banking restrictions are resolved:
+# 1. Set LIVE_TRADING_ENABLED=true
+# 2. Configure appropriate exchange API keys
+# 3. Set SPIRALBOT_MODE=LIVE
+# 4. Thoroughly test with small amounts first
+# 5. Ensure proper regulatory compliance
+
+# Current status: SIMULATION ONLY - CoinGecko data source
+# Last updated: SpiralBot v2.1
+# Compliance status: UK Banking Compliant
