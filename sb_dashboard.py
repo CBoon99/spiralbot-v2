@@ -186,14 +186,16 @@ def start_bot_process():
             st.warning("⚠️ Bot is already running!")
             return False
         
-        # Start bot process
-        cmd = ["python3", str(BOT_SCRIPT)]
+        # Start bot process with output redirected to file
+        log_file = open("bot.log", "a")
         process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=BASE_DIR
+            ["python3", "bue_flashbot_virtual.py"],
+            stdout=log_file,
+            stderr=log_file,
+            cwd="/Users/carlboon/Documents/bue-flashbot",
+            close_fds=True
         )
+        log_file.close()
         
         # Store process info in session state
         st.session_state.bot_process = process
