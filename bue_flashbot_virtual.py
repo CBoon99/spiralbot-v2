@@ -250,38 +250,36 @@ class BotManager:
         # Ensure log file exists with header
         if not LOG_FILE.exists():
             try:
-                with open(LOG_FILE, 'w', newline='') as file:
-                    writer = csv.writer(file)
-                    writer.writerow(header)
+                with safe_file_operation(LOG_FILE, 'w') as f:
+                    if f is not None:
+                        writer = csv.writer(f)
+                        writer.writerow(header)
             except Exception as e:
                 logging.error("Failed to create log file: %s", e)
                 return False
         
-        # Append data with retry logic and file locking
+        # Append data with retry logic
         for attempt in range(3):
             try:
-                with open(LOG_FILE, 'a', newline='') as file:
-                    # Acquire file lock
-                    import fcntl
-                    fcntl.flock(file.fileno(), fcntl.LOCK_EX)
+                with safe_file_operation(LOG_FILE, 'a') as f:
+                    if f is None:
+                        logging.error("Failed to acquire file lock (attempt %d)", attempt + 1)
+                        time.sleep(0.2)
+                        continue
                     
                     # Verify header matches
-                    file.seek(0)
-                    reader = csv.reader(file)
+                    f.seek(0)
+                    reader = csv.reader(f)
                     existing_header = next(reader, None)
                     if existing_header != header:
                         logging.error("CSV header mismatch - expected: %s, got: %s", 
                                     header, existing_header)
-                        fcntl.flock(file.fileno(), fcntl.LOCK_UN)
                         return False
                     
                     # Write data
-                    file.seek(0, 2)  # Seek to end
-                    writer = csv.writer(file)
+                    f.seek(0, 2)  # Seek to end
+                    writer = csv.writer(f)
                     writer.writerow(row_data)
-                    
-                    # Release file lock
-                    fcntl.flock(file.fileno(), fcntl.LOCK_UN)
                 
                 self.state_saved = True
                 return True
