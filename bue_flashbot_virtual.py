@@ -233,7 +233,7 @@ class BotManager:
 
     def log_to_csv(self, row_data):
         """
-        Professional CSV logging with file locking
+        Professional CSV logging with file locking and retry logic
         Ensures data integrity during concurrent access
         """
         header = [
@@ -257,12 +257,31 @@ class BotManager:
                 logging.error("Failed to create log file: %s", e)
                 return False
         
-        # Append data with retry logic
+        # Append data with retry logic and file locking
         for attempt in range(3):
             try:
                 with open(LOG_FILE, 'a', newline='') as file:
+                    # Acquire file lock
+                    import fcntl
+                    fcntl.flock(file.fileno(), fcntl.LOCK_EX)
+                    
+                    # Verify header matches
+                    file.seek(0)
+                    reader = csv.reader(file)
+                    existing_header = next(reader, None)
+                    if existing_header != header:
+                        logging.error("CSV header mismatch - expected: %s, got: %s", 
+                                    header, existing_header)
+                        fcntl.flock(file.fileno(), fcntl.LOCK_UN)
+                        return False
+                    
+                    # Write data
+                    file.seek(0, 2)  # Seek to end
                     writer = csv.writer(file)
                     writer.writerow(row_data)
+                    
+                    # Release file lock
+                    fcntl.flock(file.fileno(), fcntl.LOCK_UN)
                 
                 self.state_saved = True
                 return True
