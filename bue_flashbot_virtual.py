@@ -22,6 +22,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+from contextlib import contextmanager
+import fcntl
 
 # Dynamic configuration - no hardcoded paths
 BASE_DIR = Path(__file__).resolve().parent
@@ -81,6 +83,32 @@ def setup_logging():
 
     logging.setLogRecordFactory(record_factory)
     return logger
+
+@contextmanager
+def safe_file_operation(file_path, mode='r', timeout=3):
+    """Professional file locking with timeout"""
+    if not file_path.exists():
+        if 'w' in mode or 'a' in mode:
+            file_path.parent.mkdir(exist_ok=True)
+        else:
+            yield None
+            return
+    
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        try:
+            with open(file_path, mode) as f:
+                if 'r' in mode:
+                    fcntl.flock(f, fcntl.LOCK_SH | fcntl.LOCK_NB)
+                else:
+                    fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                yield f
+                return
+        except (IOError, OSError, BlockingIOError):
+            time.sleep(0.1)
+    
+    logging.warning(f"File lock timeout: {file_path}")
+    yield None
 
 class BotManager:
     def __init__(self):
