@@ -96,6 +96,8 @@ def load_trading_data():
     try:
         with safe_file_operation(LOG_FILE, 'r') as f:
             if f is None:
+                st.error("Unable to access log file - it may be locked by another process")
+                log_dashboard_event("Log file access failed - file locked", "error")
                 return pd.DataFrame()
             
             df = pd.read_csv(f)
@@ -105,23 +107,33 @@ def load_trading_data():
             missing_cols = [col for col in required_cols if col not in df.columns]
             
             if missing_cols:
-                st.error(f"Invalid log format. Missing columns: {missing_cols}")
+                st.error(f"Invalid log format. Missing required columns: {', '.join(missing_cols)}")
                 log_dashboard_event(f"Missing columns in log: {missing_cols}", "error")
                 return pd.DataFrame()
             
             # Clean and convert data
             df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
-            df = df.dropna(subset=['timestamp'])
+            
+            # Drop rows with missing timestamps
+            invalid_timestamps = df['timestamp'].isna().sum()
+            if invalid_timestamps > 0:
+                log_dashboard_event(f"Dropped {invalid_timestamps} rows with invalid timestamps", "warning")
+                df = df.dropna(subset=['timestamp'])
+            
+            # Sort by timestamp
             df = df.sort_values('timestamp')
             
-            # Remove duplicates based on timestamp and symbol
-            df = df.drop_duplicates(subset=['timestamp', 'symbol', 'action'], keep='last')
+            # Remove duplicates based on timestamp, symbol, and action
+            duplicates = df.duplicated(subset=['timestamp', 'symbol', 'action'], keep='last').sum()
+            if duplicates > 0:
+                log_dashboard_event(f"Removed {duplicates} duplicate entries", "warning")
+                df = df.drop_duplicates(subset=['timestamp', 'symbol', 'action'], keep='last')
             
             return df
             
     except Exception as e:
-        log_dashboard_event(f"Data loading error: {e}", "error")
-        st.error(f"Error loading data: {e}")
+        log_dashboard_event(f"Data loading error: {str(e)}", "error")
+        st.error(f"Error loading trading data: {str(e)}")
         return pd.DataFrame()
 
 def get_bot_status():
