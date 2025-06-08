@@ -261,7 +261,7 @@ class BotManager:
 
     def log_to_csv(self, row_data):
         """
-        Professional CSV logging with file locking and retry logic
+        Professional CSV logging with retry logic
         Ensures data integrity during concurrent access
         """
         header = [
@@ -278,10 +278,9 @@ class BotManager:
         # Ensure log file exists with header
         if not LOG_FILE.exists():
             try:
-                with safe_file_operation(LOG_FILE, 'w') as f:
-                    if f is not None:
-                        writer = csv.writer(f)
-                        writer.writerow(header)
+                with open(LOG_FILE, 'w', newline='') as f:
+                    writer = csv.writer(f)
+                    writer.writerow(header)
             except Exception as e:
                 logging.error("Failed to create log file: %s", e)
                 return False
@@ -289,12 +288,7 @@ class BotManager:
         # Append data with retry logic
         for attempt in range(3):
             try:
-                with safe_file_operation(LOG_FILE, 'a') as f:
-                    if f is None:
-                        logging.error("Failed to acquire file lock (attempt %d)", attempt + 1)
-                        time.sleep(0.2)
-                        continue
-                    
+                with open(LOG_FILE, 'a', newline='') as f:
                     # Verify header matches
                     f.seek(0)
                     reader = csv.reader(f)
