@@ -71,13 +71,15 @@ def setup_logging():
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
     
-    # Add session_id to all log records
-    class SessionFilter(logging.Filter):
-        def filter(self, record):
-            record.session_id = session_id
-            return True
-    
-    logger.addFilter(SessionFilter())
+    # Ensure all log records include the session_id field
+    old_factory = logging.getLogRecordFactory()
+
+    def record_factory(*args, **kwargs):
+        record = old_factory(*args, **kwargs)
+        record.session_id = session_id
+        return record
+
+    logging.setLogRecordFactory(record_factory)
     return logger
 
 class BotManager:
