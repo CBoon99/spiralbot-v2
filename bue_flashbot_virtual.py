@@ -289,17 +289,6 @@ class BotManager:
         for attempt in range(3):
             try:
                 with open(LOG_FILE, 'a', newline='') as f:
-                    # Verify header matches
-                    f.seek(0)
-                    reader = csv.reader(f)
-                    existing_header = next(reader, None)
-                    if existing_header != header:
-                        logging.error("CSV header mismatch - expected: %s, got: %s", 
-                                    header, existing_header)
-                        return False
-                    
-                    # Write data
-                    f.seek(0, 2)  # Seek to end
                     writer = csv.writer(f)
                     writer.writerow(row_data)
                 
